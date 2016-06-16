@@ -6,21 +6,23 @@ _ = require 'underscore'
 # this class has to be moved to hpubjs!!!
 class Content
   constructor: (@list) ->
-    
-  exec: ->
-    _.filter @list, (list) ->
-      parts = list.split('.')
-      ext = parts[parts.length - 1]
 
-      if ext is "page" or ext is "html"
-        return list
+  exec: ->
+    filtered = _.filter @list, (list) ->
+      regex = /page([0-9]+).html/.exec(list)
+      return list if regex and regex[1]
+
+    _.sortBy filtered, (page) ->
+      regex = /page([0-9]+).html/.exec(page)
+      if regex then return parseInt(regex[1], 10)
+      else return 0
 
 class Hpuber
   constructor: (@dir, mdata={}) ->
     meta =
       hpub: 1
-      author: ['undefined']
-      title: "undefined"
+      author: []
+      title: undefined
       date: moment().format("YYYY-MM-DD")
       url: 'http://example.com/book.hpub'
       contents: []
@@ -36,6 +38,7 @@ class Hpuber
       @hpub.filelist = list
 
       @hpub.meta.contents = _.union @hpub.meta.contents, new Content(list).exec()
+      @hpub.meta.cover = "book.png" if list.indexOf("book.png") > 0
       callback null, @
 
   finalize: (callback) ->

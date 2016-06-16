@@ -15,7 +15,7 @@ class PdfToHpub
       'embed': 'cfijo'
       'split-pages': '1'
       'space-as-offset': '0'
-      'font-suffix': '.woff'
+      'font-format': 'woff'
       'dest-dir': @hpubDir
       'css-filename': 'book.css'
       'decompose-ligature': '1'
@@ -43,7 +43,6 @@ class PdfToHpub
 
     fs.mkdirsSync(@hpubDir)
 
-
   triggerProgress: ->
     if @progress and typeof @progress is "function"
       @progress @progressState
@@ -56,7 +55,8 @@ class PdfToHpub
 
   getCover: (callback) ->
     @mergeOptions()
-    new Cover(@pdfFile, @hpubDir, @options).fetch (err) ->
+    new Cover(@pdfFile, @hpubDir, @options).fetch (err) =>
+
       callback(err)
 
   convertPdf: (callback) ->
@@ -110,6 +110,7 @@ class PdfToHpub
 
   mergePdfOptions: ->
     @pdfOptions = _.extend @pdfDefaults, @pdfOptions
+    @pdfOptions
 
   progress: (callback) ->
     @progressCB = callback
